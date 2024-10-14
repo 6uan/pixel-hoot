@@ -1,8 +1,15 @@
+import AssetGallery from "./components/AssetGallery";
+
 function App() {
   return (
     <>
       <div>test generation</div>
-      <div className="relative">
+      <AssetGallery assetType="background" />
+      <AssetGallery assetType="body" />
+      <AssetGallery assetType="beak" />
+      <AssetGallery assetType="eyes" />
+      <AssetGallery assetType="outfit" />
+      {/* <div className="relative">
         <img
           className="absolute top-0 left-0"
           src="https://github.com/6uan/assets/blob/main/background/blue.png?raw=true"
@@ -24,7 +31,7 @@ function App() {
           className="absolute top-0 left-0"
           src="https://github.com/6uan/assets/blob/main/outfit/gold-chain.png?raw=true"
         />
-      </div>
+      </div> */}
     </>
   );
 }
