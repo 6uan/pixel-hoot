@@ -25,7 +25,7 @@ const getAssetsByType = async (req, res) => {
   }
 };
 
-// Function to get a specific asset by ID
+// Function to get a specific asset by ID not really used in the project
 const getAssetById = async (req, res) => {
   const assetId = req.params.assetId;
 
@@ -39,5 +39,33 @@ const getAssetById = async (req, res) => {
   }
 };
 
+
+const createHoot = async (req, res) => {
+  try {
+    const { name, background, body, beak, eyes, outfit, submittedby } = req.body;
+
+    // Validate required fields
+    if (!name || !background || !body || !beak || !eyes) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    // Insert into hoots table
+    const result = await pool.query(`
+      INSERT INTO customitem (name, background, body, beak, eyes, outfit, submittedby)
+      VALUES($1, $2, $3, $4, $5, $6, $7)
+      RETURNING *`,
+      [name, background, body, beak, eyes, outfit || null, submittedby]
+    );
+
+    // Send back the created hoot
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    res.status(409).json({ error: error.message });
+  }
+};
+
+
+
+
 // Export the functions
-export default { getAssets, getAssetsByType, getAssetById };
+export default { getAssets, getAssetsByType, getAssetById, createHoot };

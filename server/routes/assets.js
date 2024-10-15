@@ -7,5 +7,6 @@ const router = express.Router();
 router.get("/", AssetController.getAssets); // Get all assets
 router.get("/type/:assetType", AssetController.getAssetsByType); // Get assets by type (e.g., background, beak)
 router.get("/:assetId", AssetController.getAssetById); // Get a specific asset by ID
+router.post("/createHoot", AssetController.createHoot); // Create a new hoot
 
 export default router;

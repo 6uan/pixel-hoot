@@ -2,6 +2,31 @@ import { pool } from "./database.js";
 import "./dotenv.js";
 import assetData from "../data/assets.js";
 
+// Create the hoots table
+const createCustomItemTable = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS customitem (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      background TEXT NOT NULL,
+      body TEXT NOT NULL,
+      beak TEXT NOT NULL,
+      eyes TEXT NOT NULL,
+      outfit TEXT, -- Optional
+      submittedby VARCHAR(255) NOT NULL,
+      submittedon TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+
+  try {
+    await pool.query(createTableQuery);
+    console.log("🎉 customitem table created successfully (or already exists)");
+  } catch (err) {
+    console.error("⚠️ error creating hoots table", err);
+  }
+};
+
+// Create the assets table and seed it
 const createAssetsTable = async () => {
   const createTableQuery = `
     DROP TABLE IF EXISTS assets;
@@ -15,7 +40,7 @@ const createAssetsTable = async () => {
   `;
 
   try {
-    const res = await pool.query(createTableQuery);
+    await pool.query(createTableQuery);
     console.log("🎉 assets table created successfully");
   } catch (err) {
     console.error("⚠️ error creating assets table", err);
@@ -50,4 +75,10 @@ const seedAssetsTable = async () => {
   }
 };
 
-seedAssetsTable();
+// Run the table creation for hoots and assets
+const run = async () => {
+  await createCustomItemTable(); // Create the hoots table
+  await seedAssetsTable(); // Create and seed the assets table
+};
+
+run();

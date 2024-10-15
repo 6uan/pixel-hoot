@@ -6,6 +6,7 @@ import assetRouter from "./routes/assets.js";
 const app = express();
 
 app.use(cors());
+app.use(express.json()); // This is required to parse JSON request bodies
 
 app.get("/", (req, res) => {
   res.status(200).send("Hello World");
