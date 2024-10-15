@@ -1,38 +1,32 @@
-import AssetGallery from "./components/AssetGallery";
+import CreateHoot from "./components/CreateHoot";
+import PromptMenu from "./components/PromptMenu";
+import Header from "./components/Header";
+import UserGallery from "./components/UserGallery";
+import { useRoutes } from "react-router-dom";
 
 function App() {
+  const routes = [
+    {
+      path: "/",
+      element: <PromptMenu />,
+    },
+    {
+      path: "/create",
+      element: <CreateHoot />,
+    },
+    {
+      path: "/gallery",
+      element: <UserGallery />,
+    },
+  ];
+
+  const element = useRoutes(routes);
+
   return (
-    <>
-      <div>test generation</div>
-      <AssetGallery assetType="background" />
-      <AssetGallery assetType="body" />
-      <AssetGallery assetType="beak" />
-      <AssetGallery assetType="eyes" />
-      <AssetGallery assetType="outfit" />
-      {/* <div className="relative">
-        <img
-          className="absolute top-0 left-0"
-          src="https://github.com/6uan/assets/blob/main/background/blue.png?raw=true"
-        />
-        <img
-          className="absolute top-0 left-0"
-          src="https://github.com/6uan/assets/blob/main/body/brave-orange.png?raw=true"
-          alt="background"
-        />
-        <img
-          className="absolute top-0 left-0"
-          src="https://github.com/6uan/assets/blob/main/beak/long-grey.png?raw=true"
-        />
-        <img
-          className="absolute top-0 left-0"
-          src="https://github.com/6uan/assets/blob/main/eyes/fire.png?raw=true"
-        />
-        <img
-          className="absolute top-0 left-0"
-          src="https://github.com/6uan/assets/blob/main/outfit/gold-chain.png?raw=true"
-        />
-      </div> */}
-    </>
+    <div className="flex h-screen flex-col">
+      <Header />
+      {element}
+    </div>
   );
 }
 
