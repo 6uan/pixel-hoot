@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import LivePreview from "../components/LivePreview"; // Assuming you have this component
+import { getAllHoots, deleteHootById } from "../services/api";
 
 const ViewHoots = () => {
   const [customItems, setCustomItems] = useState([]);
@@ -9,8 +10,7 @@ const ViewHoots = () => {
   useEffect(() => {
     const fetchCustomItems = async () => {
       try {
-        const response = await fetch("http://localhost:3001/assets/allHoots");
-        const data = await response.json();
+        const data = await getAllHoots();
         setCustomItems(data);
       } catch (error) {
         console.error("Error fetching custom items:", error);
@@ -20,20 +20,13 @@ const ViewHoots = () => {
     fetchCustomItems();
   }, []);
 
+  // Handle delete
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(
-        `http://localhost:3001/assets/deleteHoot/${id}`,
-        {
-          method: "DELETE",
-        }
-      );
-
-      if (response.ok) {
+      const response = await deleteHootById(id); // Use the deleteHootById function from api.js
+      if (response) {
         // Remove the deleted item from the state
         setCustomItems(customItems.filter((item) => item.id !== id));
-      } else {
-        console.error("Error deleting hoot:", await response.json());
       }
     } catch (error) {
       console.error("Error deleting hoot:", error);

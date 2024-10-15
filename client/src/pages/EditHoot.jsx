@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import LivePreview from "../components/LivePreview";
 import AssetSelection from "../components/AssetSelection";
-import { useParams } from "react-router-dom"; // To get hootId from URL
+import { useParams } from "react-router-dom";
+import { getAssetsByType, getHootById, updateHoot } from "../services/api";
 
 const EditHoot = () => {
   const { hootId } = useParams(); // Get hootId from the URL
@@ -23,27 +24,11 @@ const EditHoot = () => {
   useEffect(() => {
     const fetchAssets = async () => {
       try {
-        const bgResponse = await fetch(
-          "http://localhost:3001/assets/type/background"
-        );
-        const bodyResponse = await fetch(
-          "http://localhost:3001/assets/type/body"
-        );
-        const beakResponse = await fetch(
-          "http://localhost:3001/assets/type/beak"
-        );
-        const eyesResponse = await fetch(
-          "http://localhost:3001/assets/type/eyes"
-        );
-        const outfitResponse = await fetch(
-          "http://localhost:3001/assets/type/outfit"
-        );
-
-        setBackgrounds(await bgResponse.json());
-        setBodies(await bodyResponse.json());
-        setBeaks(await beakResponse.json());
-        setEyes(await eyesResponse.json());
-        setOutfits(await outfitResponse.json());
+        setBackgrounds(await getAssetsByType("background"));
+        setBodies(await getAssetsByType("body"));
+        setBeaks(await getAssetsByType("beak"));
+        setEyes(await getAssetsByType("eyes"));
+        setOutfits(await getAssetsByType("outfit"));
       } catch (error) {
         console.error("Error fetching assets:", error);
       }
@@ -56,10 +41,7 @@ const EditHoot = () => {
   useEffect(() => {
     const fetchHoot = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:3001/assets/getHoot/${hootId}`
-        );
-        const data = await response.json();
+        const data = await getHootById(hootId); // Call the API function
         // Set the selected assets to the existing hoot data
         setSelectedBackground({ imageurl: data.background });
         setSelectedBody({ imageurl: data.body });
@@ -100,25 +82,15 @@ const EditHoot = () => {
     }
 
     try {
-      const response = await fetch(
-        `http://localhost:3001/assets/updateHoot/${hootId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(hootData),
-        }
-      );
+      // Call the updateHoot function from the service
+      const response = await updateHoot(hootId, hootData);
 
-      if (response.ok) {
+      if (response) {
         alert("Hoot updated successfully!");
         handleReset();
-      } else {
-        console.error("Error updating hoot");
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error updating hoot:", error);
     }
   };
 
@@ -134,7 +106,7 @@ const EditHoot = () => {
   return (
     <div className="flex w-full flex-grow flex-col items-center justify-center px-72">
       <div className="flex rounded-md border-2">
-        <div className="size-[612px] rounded-l-md bg-gray-100">
+        <div className="size-[612px] rounded-l-[4px] bg-gray-100">
           <LivePreview
             selectedBackground={selectedBackground}
             selectedBody={selectedBody}
@@ -144,7 +116,7 @@ const EditHoot = () => {
           />
         </div>
         {/* Form Section */}
-        <div className="flex h-[612px] w-[650px] flex-col rounded-md border-l-2">
+        <div className="flex h-[612px] w-[650px] flex-col rounded-r-md border-l-2">
           {/* Navigation Buttons */}
           <div className="flex">
             {["background", "body", "beak", "eyes", "outfit"].map(
@@ -161,7 +133,6 @@ const EditHoot = () => {
               )
             )}
           </div>
-
           {/* Conditional Rendering for Assets */}
           {activeCategory === "background" && (
             <AssetSelection
@@ -198,7 +169,7 @@ const EditHoot = () => {
               setSelectedAsset={setSelectedOutfit}
             />
           )}
-
+          {/* Reset and Edit */}
           <div className="flex h-24 w-full items-center border-t-2">
             <button
               onClick={handleReset}

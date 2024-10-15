@@ -7,13 +7,25 @@ const LivePreview = ({
   selectedEyes,
   selectedOutfit,
 }) => {
+  const isEmpty =
+    !selectedBackground &&
+    !selectedBody &&
+    !selectedBeak &&
+    !selectedEyes &&
+    !selectedOutfit;
+
   return (
-    <div className="relative h-full w-full">
+    <div className="relative flex h-full w-full items-center justify-center">
+      {isEmpty && (
+        <p className="text-lg font-semibold text-gray-500">
+          Make a selection to get started
+        </p>
+      )}
       {selectedBackground && (
         <img
           src={selectedBackground.imageurl}
           alt="Background"
-          className="absolute inset-0 object-cover"
+          className="absolute inset-0 rounded-l-[4px] object-cover"
         />
       )}
       {selectedBody && (

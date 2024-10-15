@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import LivePreview from "../components/LivePreview";
 import AssetSelection from "../components/AssetSelection";
+import { getAssetsByType, createHoot } from "../services/api.js";
 
 const CreateHoot = () => {
   const [backgrounds, setBackgrounds] = useState([]);
@@ -21,27 +22,11 @@ const CreateHoot = () => {
   useEffect(() => {
     const fetchAssets = async () => {
       try {
-        const bgResponse = await fetch(
-          "http://localhost:3001/assets/type/background"
-        );
-        const bodyResponse = await fetch(
-          "http://localhost:3001/assets/type/body"
-        );
-        const beakResponse = await fetch(
-          "http://localhost:3001/assets/type/beak"
-        );
-        const eyesResponse = await fetch(
-          "http://localhost:3001/assets/type/eyes"
-        );
-        const outfitResponse = await fetch(
-          "http://localhost:3001/assets/type/outfit"
-        );
-
-        setBackgrounds(await bgResponse.json());
-        setBodies(await bodyResponse.json());
-        setBeaks(await beakResponse.json());
-        setEyes(await eyesResponse.json());
-        setOutfits(await outfitResponse.json());
+        setBackgrounds(await getAssetsByType("background"));
+        setBodies(await getAssetsByType("body"));
+        setBeaks(await getAssetsByType("beak"));
+        setEyes(await getAssetsByType("eyes"));
+        setOutfits(await getAssetsByType("outfit"));
       } catch (error) {
         console.error("Error fetching assets:", error);
       }
@@ -54,14 +39,6 @@ const CreateHoot = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Print the currently selected assets to the console
-    console.log("Selected Background:", selectedBackground);
-    console.log("Selected Body:", selectedBody);
-    console.log("Selected Beak:", selectedBeak);
-    console.log("Selected Eyes:", selectedEyes);
-    console.log("Selected Outfit:", selectedOutfit);
-
-    // Prepare the selected options for submission
     const hootData = {
       name: "Custom Hoot", // Add a name for the hoot
       background: selectedBackground?.imageurl || null,
@@ -84,24 +61,16 @@ const CreateHoot = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:3001/assets/createHoot", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(hootData),
-      });
-
-      if (response.ok) {
+      const response = await createHoot(hootData);
+      if (response) {
         alert("Hoot created successfully!");
         handleReset();
-      } else {
-        console.error("Error creating hoot");
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error creating hoot:", error);
     }
   };
+
   // Handle reset functionality
   const handleReset = () => {
     setSelectedBackground(null);
@@ -114,7 +83,8 @@ const CreateHoot = () => {
   return (
     <div className="flex w-full flex-grow flex-col items-center justify-center px-72">
       <div className="flex rounded-md border-2">
-        <div className="size-[612px] rounded-l-md bg-gray-100">
+        {/* Live Preview */}
+        <div className="size-[612px] rounded-l-[4px] bg-gray-100">
           <LivePreview
             selectedBackground={selectedBackground}
             selectedBody={selectedBody}
@@ -124,7 +94,7 @@ const CreateHoot = () => {
           />
         </div>
         {/* Form Section */}
-        <div className="flex h-[612px] w-[650px] flex-col rounded-md border-l-2">
+        <div className="flex h-[612px] w-[650px] flex-col rounded-r-md border-l-2">
           {/* Navigation Buttons */}
           <div className="flex">
             {["background", "body", "beak", "eyes", "outfit"].map(
@@ -141,7 +111,6 @@ const CreateHoot = () => {
               )
             )}
           </div>
-
           {/* Conditional Rendering for Assets */}
           {activeCategory === "background" && (
             <AssetSelection
@@ -178,7 +147,7 @@ const CreateHoot = () => {
               setSelectedAsset={setSelectedOutfit}
             />
           )}
-
+          {/* Reset and Submit Buttons */}
           <div className="flex h-24 w-full items-center border-t-2">
             <button
               onClick={handleReset}
