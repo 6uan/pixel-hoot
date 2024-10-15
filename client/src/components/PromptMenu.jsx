@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 const PromptMenu = () => {
   return (
-    <div className="flex h-screen w-full items-center justify-center">
+    <div className="flex w-full flex-grow items-center justify-center">
       <main className="flex h-auto flex-col rounded-lg border-2">
         <img
           className="rounded-t-md border-2"

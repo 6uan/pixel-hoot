@@ -54,17 +54,37 @@ const CreateHoot = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Print the currently selected assets to the console
+    console.log("Selected Background:", selectedBackground);
+    console.log("Selected Body:", selectedBody);
+    console.log("Selected Beak:", selectedBeak);
+    console.log("Selected Eyes:", selectedEyes);
+    console.log("Selected Outfit:", selectedOutfit);
+
     // Prepare the selected options for submission
     const hootData = {
-      background: selectedBackground,
-      body: selectedBody,
-      beak: selectedBeak,
-      eyes: selectedEyes,
-      outfit: selectedOutfit,
+      name: "Custom Hoot", // Add a name for the hoot
+      background: selectedBackground?.imageurl || null,
+      body: selectedBody?.imageurl || null,
+      beak: selectedBeak?.imageurl || null,
+      eyes: selectedEyes?.imageurl || null,
+      outfit: selectedOutfit?.imageurl || null,
+      submittedby: "user123", // Example, replace with actual user or form input
     };
 
+    // Validate if required fields are selected
+    if (
+      !selectedBackground ||
+      !selectedBody ||
+      !selectedBeak ||
+      !selectedEyes
+    ) {
+      console.error("Please select background, body, beak, and eyes.");
+      return;
+    }
+
     try {
-      const response = await fetch("http://localhost:3001/api/hoot", {
+      const response = await fetch("http://localhost:3001/assets/createHoot", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -73,7 +93,8 @@ const CreateHoot = () => {
       });
 
       if (response.ok) {
-        console.log("Hoot created successfully!");
+        alert("Hoot created successfully!");
+        handleReset();
       } else {
         console.error("Error creating hoot");
       }
@@ -81,7 +102,6 @@ const CreateHoot = () => {
       console.error("Error:", error);
     }
   };
-
   // Handle reset functionality
   const handleReset = () => {
     setSelectedBackground(null);
@@ -92,7 +112,7 @@ const CreateHoot = () => {
   };
 
   return (
-    <div className="flex h-screen w-full flex-col items-center justify-center px-72">
+    <div className="flex w-full flex-grow flex-col items-center justify-center px-72">
       <div className="flex rounded-md border-2">
         <div className="size-[612px] rounded-l-md bg-gray-100">
           <LivePreview
