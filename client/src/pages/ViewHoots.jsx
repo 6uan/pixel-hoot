@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import LivePreview from "./LivePreview"; // Assuming you have this component
+import { Link } from "react-router-dom";
+import LivePreview from "../components/LivePreview"; // Assuming you have this component
 
-const CustomItemsList = () => {
+const ViewHoots = () => {
   const [customItems, setCustomItems] = useState([]);
 
   // Fetch custom items from the backend
@@ -18,6 +19,26 @@ const CustomItemsList = () => {
 
     fetchCustomItems();
   }, []);
+
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3001/assets/deleteHoot/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (response.ok) {
+        // Remove the deleted item from the state
+        setCustomItems(customItems.filter((item) => item.id !== id));
+      } else {
+        console.error("Error deleting hoot:", await response.json());
+      }
+    } catch (error) {
+      console.error("Error deleting hoot:", error);
+    }
+  };
 
   return (
     <div className="w-full flex-grow">
@@ -46,6 +67,18 @@ const CustomItemsList = () => {
                 <p className="text-sm text-gray-600">
                   Date: {new Date(item.submittedon).toLocaleString()}
                 </p>
+                <Link
+                  to={`/edit/${item.id}`}
+                  className="mt-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                >
+                  Edit
+                </Link>
+                <button
+                  className="mt-2 rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+                  onClick={() => handleDelete(item.id)}
+                >
+                  Delete
+                </button>
               </div>
             </div>
           ))
@@ -57,4 +90,4 @@ const CustomItemsList = () => {
   );
 };
 
-export default CustomItemsList;
+export default ViewHoots;

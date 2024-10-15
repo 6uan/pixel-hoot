@@ -37,7 +37,7 @@ const LivePreview = ({
           className="absolute inset-0"
         />
       )}
-      {selectedOutfit && (
+      {selectedOutfit && selectedOutfit.imageurl && (
         <img
           src={selectedOutfit.imageurl}
           alt="Outfit"

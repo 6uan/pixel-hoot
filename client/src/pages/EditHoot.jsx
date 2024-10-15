@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
-import LivePreview from "./LivePreview";
-import AssetSelection from "./AssetSelection";
+import LivePreview from "../components/LivePreview";
+import AssetSelection from "../components/AssetSelection";
+import { useParams } from "react-router-dom"; // To get hootId from URL
 
-const CreateHoot = () => {
+const EditHoot = () => {
+  const { hootId } = useParams(); // Get hootId from the URL
   const [backgrounds, setBackgrounds] = useState([]);
   const [bodies, setBodies] = useState([]);
   const [beaks, setBeaks] = useState([]);
@@ -50,20 +52,34 @@ const CreateHoot = () => {
     fetchAssets();
   }, []);
 
-  // Handle form submission
+  // Fetch the existing hoot data to pre-fill for editing
+  useEffect(() => {
+    const fetchHoot = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:3001/assets/getHoot/${hootId}`
+        );
+        const data = await response.json();
+        // Set the selected assets to the existing hoot data
+        setSelectedBackground({ imageurl: data.background });
+        setSelectedBody({ imageurl: data.body });
+        setSelectedBeak({ imageurl: data.beak });
+        setSelectedEyes({ imageurl: data.eyes });
+        setSelectedOutfit({ imageurl: data.outfit });
+      } catch (error) {
+        console.error("Error fetching hoot:", error);
+      }
+    };
+
+    fetchHoot();
+  }, [hootId]);
+
+  // Handle form submission (PATCH request)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Print the currently selected assets to the console
-    console.log("Selected Background:", selectedBackground);
-    console.log("Selected Body:", selectedBody);
-    console.log("Selected Beak:", selectedBeak);
-    console.log("Selected Eyes:", selectedEyes);
-    console.log("Selected Outfit:", selectedOutfit);
-
-    // Prepare the selected options for submission
     const hootData = {
-      name: "Custom Hoot", // Add a name for the hoot
+      name: "Updated Hoot", // This could come from a user input as well
       background: selectedBackground?.imageurl || null,
       body: selectedBody?.imageurl || null,
       beak: selectedBeak?.imageurl || null,
@@ -84,24 +100,28 @@ const CreateHoot = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:3001/assets/createHoot", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(hootData),
-      });
+      const response = await fetch(
+        `http://localhost:3001/assets/updateHoot/${hootId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(hootData),
+        }
+      );
 
       if (response.ok) {
-        alert("Hoot created successfully!");
+        alert("Hoot updated successfully!");
         handleReset();
       } else {
-        console.error("Error creating hoot");
+        console.error("Error updating hoot");
       }
     } catch (error) {
       console.error("Error:", error);
     }
   };
+
   // Handle reset functionality
   const handleReset = () => {
     setSelectedBackground(null);
@@ -190,7 +210,7 @@ const CreateHoot = () => {
               onClick={handleSubmit}
               className="flex h-full w-1/2 items-center justify-center border-l-2 text-2xl font-bold"
             >
-              Submit Hoot
+              Update Hoot
             </button>
           </div>
         </div>
@@ -199,4 +219,4 @@ const CreateHoot = () => {
   );
 };
 
-export default CreateHoot;
+export default EditHoot;

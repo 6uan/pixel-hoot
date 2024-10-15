@@ -25,20 +25,6 @@ const getAssetsByType = async (req, res) => {
   }
 };
 
-// Function to get a specific asset by ID not really used in the project
-const getAssetById = async (req, res) => {
-  const assetId = req.params.assetId;
-
-  try {
-    const results = await pool.query("SELECT * FROM assets WHERE id = $1", [
-      assetId,
-    ]);
-    res.status(200).json(results.rows[0]);
-  } catch (error) {
-    res.status(409).json({ error: error.message });
-  }
-};
-
 const createHoot = async (req, res) => {
   try {
     const { name, background, body, beak, eyes, outfit, submittedby } =
@@ -74,11 +60,92 @@ const getAllHoots = async (req, res) => {
   }
 };
 
+const deleteHoot = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Delete the custom item by ID
+    const result = await pool.query("DELETE FROM customitem WHERE id = $1", [
+      id,
+    ]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Hoot not found" });
+    }
+
+    res.status(200).json({ message: "Hoot deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const patchHoot = async (req, res) => {
+  const { hootId } = req.params;
+  const { name, background, body, beak, eyes, outfit } = req.body;
+
+  try {
+    // Only update the fields that are provided
+    const fieldsToUpdate = {};
+    if (name) fieldsToUpdate.name = name;
+    if (background) fieldsToUpdate.background = background;
+    if (body) fieldsToUpdate.body = body;
+    if (beak) fieldsToUpdate.beak = beak;
+    if (eyes) fieldsToUpdate.eyes = eyes;
+    if (outfit) fieldsToUpdate.outfit = outfit;
+
+    // Dynamically build the query
+    const setClause = Object.keys(fieldsToUpdate)
+      .map((field, idx) => `${field} = $${idx + 1}`)
+      .join(", ");
+    const values = Object.values(fieldsToUpdate);
+
+    if (setClause.length === 0) {
+      return res.status(400).json({ error: "No fields to update" });
+    }
+
+    // Update the item in the database
+    const result = await pool.query(
+      `UPDATE customitem SET ${setClause} WHERE id = $${
+        values.length + 1
+      } RETURNING *`,
+      [...values, hootId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Hoot not found" });
+    }
+
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const getHootById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query("SELECT * FROM customitem WHERE id = $1", [
+      id,
+    ]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Hoot not found" });
+    }
+
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Export the functions
 export default {
   getAssets,
   getAssetsByType,
-  getAssetById,
   createHoot,
   getAllHoots,
+  deleteHoot,
+  patchHoot,
+  getHootById,
 };
