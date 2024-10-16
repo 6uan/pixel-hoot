@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import LivePreview from "../components/LivePreview";
 import AssetSelection from "../components/AssetSelection";
 import { getAssetsByType, createHoot } from "../services/api.js";
+import gem from "../assets/gem.svg";
 
 const CreateHoot = () => {
   const [backgrounds, setBackgrounds] = useState([]);
@@ -80,6 +81,29 @@ const CreateHoot = () => {
     setSelectedOutfit(null);
   };
 
+  // Calculates total gems based on selected assets
+  const calculateTotalGems = () => {
+    let total = 0;
+
+    if (selectedBackground) {
+      total += selectedBackground.gems || 0; // Add gems for background
+    }
+    if (selectedBody) {
+      total += selectedBody.gems || 0; // Add gems for body
+    }
+    if (selectedBeak) {
+      total += selectedBeak.gems || 0; // Add gems for beak
+    }
+    if (selectedEyes) {
+      total += selectedEyes.gems || 0; // Add gems for eyes
+    }
+    if (selectedOutfit) {
+      total += selectedOutfit?.gems || 0; // Add gems for outfit (optional)
+    }
+
+    return total;
+  };
+
   return (
     <div className="flex w-full flex-grow flex-col items-center justify-center px-72">
       <div className="flex rounded-md border-2">
@@ -91,6 +115,7 @@ const CreateHoot = () => {
             selectedBeak={selectedBeak}
             selectedEyes={selectedEyes}
             selectedOutfit={selectedOutfit}
+            className="rounded-l-[4px]"
           />
         </div>
         {/* Form Section */}
@@ -147,13 +172,18 @@ const CreateHoot = () => {
               setSelectedAsset={setSelectedOutfit}
             />
           )}
-          {/* Reset and Submit Buttons */}
-          <div className="flex h-24 w-full items-center border-t-2">
+          {/* Total, Reset, and Submit Buttons */}
+          <div className="flex h-36 w-full items-center border-t-2">
+            <div className="flex h-full w-1/4 items-center justify-center gap-2 border-r-2">
+              <img src={gem} alt="gem" className="size-4" />
+              <p>{calculateTotalGems()}</p>{" "}
+              {/* This will calculate the total gems */}
+            </div>
             <button
               onClick={handleReset}
               className="flex h-full w-1/2 items-center justify-center text-2xl font-bold"
             >
-              Reset Current
+              Reset Hoot
             </button>
             <button
               onClick={handleSubmit}

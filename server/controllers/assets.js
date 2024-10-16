@@ -35,15 +35,52 @@ const createHoot = async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
+    // Fetch the gem prices for the selected assets
+    const assetQueries = [
+      pool.query("SELECT gems FROM assets WHERE imageUrl = $1", [background]),
+      pool.query("SELECT gems FROM assets WHERE imageUrl = $1", [body]),
+      pool.query("SELECT gems FROM assets WHERE imageUrl = $1", [beak]),
+      pool.query("SELECT gems FROM assets WHERE imageUrl = $1", [eyes]),
+    ];
+
+    // If outfit is selected, fetch the gem price for the outfit too
+    if (outfit) {
+      assetQueries.push(
+        pool.query("SELECT gems FROM assets WHERE imageUrl = $1", [outfit])
+      );
+    }
+
+    // Execute all queries and get the results
+    const results = await Promise.all(assetQueries);
+
+    // Extract the gem values from the results
+    const totalGems = results.reduce((sum, result) => {
+      return sum + (result.rows[0] ? result.rows[0].gems : 0); // Add the gem value to the sum
+    }, 0);
+
+    // Now create the hoot with the selected assets and total gems
     const result = await pool.query(
       `
-      INSERT INTO customitem (name, background, body, beak, eyes, outfit, submittedby)
-      VALUES($1, $2, $3, $4, $5, $6, $7)
+      INSERT INTO customitem (name, background, body, beak, eyes, outfit, gems, submittedby)
+      VALUES($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *`,
-      [name, background, body, beak, eyes, outfit || null, submittedby]
+      [
+        name,
+        background,
+        body,
+        beak,
+        eyes,
+        outfit || null,
+        totalGems,
+        submittedby,
+      ]
     );
 
-    res.status(201).json(result.rows[0]);
+    // Return the created hoot and the total gem price
+    res.status(201).json({
+      hoot: result.rows[0],
+      totalGems,
+    });
   } catch (error) {
     res.status(409).json({ error: error.message });
   }
@@ -84,16 +121,17 @@ const patchHoot = async (req, res) => {
   const { name, background, body, beak, eyes, outfit } = req.body;
 
   try {
-    // Only update the fields that are provided
-    const fieldsToUpdate = {};
-    if (name) fieldsToUpdate.name = name;
-    if (background) fieldsToUpdate.background = background;
-    if (body) fieldsToUpdate.body = body;
-    if (beak) fieldsToUpdate.beak = beak;
-    if (eyes) fieldsToUpdate.eyes = eyes;
-    if (outfit) fieldsToUpdate.outfit = outfit;
+    // Build the query by including all fields (even those set to null)
+    const fieldsToUpdate = {
+      name,
+      background,
+      body,
+      beak,
+      eyes,
+      outfit, // Include the outfit field even if it's null
+    };
 
-    // Dynamically build the query
+    // Dynamically build the query, allowing null values
     const setClause = Object.keys(fieldsToUpdate)
       .map((field, idx) => `${field} = $${idx + 1}`)
       .join(", ");
@@ -103,7 +141,7 @@ const patchHoot = async (req, res) => {
       return res.status(400).json({ error: "No fields to update" });
     }
 
-    // Update the item in the database
+    // Update the item in the database, even if some fields are set to null
     const result = await pool.query(
       `UPDATE customitem SET ${setClause} WHERE id = $${
         values.length + 1
@@ -120,7 +158,6 @@ const patchHoot = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 const getHootById = async (req, res) => {
   const { id } = req.params;
 

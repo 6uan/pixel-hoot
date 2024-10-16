@@ -7,3 +7,21 @@
 * {
   box-sizing: border-box;
 }
+
+@font-face {
+  font-family: 'Billy';
+  font-weight: 300;
+  src: url('./assets/Billy-Light.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Billy';
+  font-weight: 400;
+  src: url('./assets/Billy-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Billy';
+  font-weight: 700;
+  src: url('./assets/Billy-Bold.ttf') format('truetype');
+}

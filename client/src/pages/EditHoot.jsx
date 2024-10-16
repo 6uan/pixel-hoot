@@ -113,6 +113,7 @@ const EditHoot = () => {
             selectedBeak={selectedBeak}
             selectedEyes={selectedEyes}
             selectedOutfit={selectedOutfit}
+            className="rounded-l-[4px]"
           />
         </div>
         {/* Form Section */}
@@ -170,7 +171,7 @@ const EditHoot = () => {
             />
           )}
           {/* Reset and Edit */}
-          <div className="flex h-24 w-full items-center border-t-2">
+          <div className="flex h-36 w-full items-center border-t-2">
             <button
               onClick={handleReset}
               className="flex h-full w-1/2 items-center justify-center text-2xl font-bold"

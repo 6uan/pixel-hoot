@@ -1,4 +1,5 @@
 import React from "react";
+import { twMerge } from "tailwind-merge";
 
 const LivePreview = ({
   selectedBackground,
@@ -6,6 +7,7 @@ const LivePreview = ({
   selectedBeak,
   selectedEyes,
   selectedOutfit,
+  className, // Accept the className prop
 }) => {
   const isEmpty =
     !selectedBackground &&
@@ -14,8 +16,14 @@ const LivePreview = ({
     !selectedEyes &&
     !selectedOutfit;
 
+  console.log(className);
   return (
-    <div className="relative flex h-full w-full items-center justify-center">
+    <div
+      className={twMerge(
+        "relative flex h-full w-full items-center justify-center",
+        className
+      )}
+    >
       {isEmpty && (
         <p className="text-lg font-semibold text-gray-500">
           Make a selection to get started
@@ -25,7 +33,7 @@ const LivePreview = ({
         <img
           src={selectedBackground.imageurl}
           alt="Background"
-          className="absolute inset-0 rounded-l-[4px] object-cover"
+          className={twMerge("absolute inset-0 object-cover", className)}
         />
       )}
       {selectedBody && (
