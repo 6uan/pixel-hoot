@@ -57,7 +57,7 @@ const CreateHoot = () => {
       !selectedBeak ||
       !selectedEyes
     ) {
-      console.error("Please select background, body, beak, and eyes.");
+      alert("Select Background, Body, Beak, and Eyes.");
       return;
     }
 
@@ -128,7 +128,9 @@ const CreateHoot = () => {
                   key={category}
                   onClick={() => setActiveCategory(category)}
                   className={`flex-grow border-b-2 px-4 py-2 text-2xl font-semibold ${
-                    activeCategory === category ? "font-extrabold" : ""
+                    activeCategory === category
+                      ? "font-extrabold underline"
+                      : ""
                   } ${index !== 0 ? "border-l-2" : ""}`}
                 >
                   {category.charAt(0).toUpperCase() + category.slice(1)}

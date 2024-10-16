@@ -16,7 +16,6 @@ const LivePreview = ({
     !selectedEyes &&
     !selectedOutfit;
 
-  console.log(className);
   return (
     <div
       className={twMerge(
