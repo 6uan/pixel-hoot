@@ -47,7 +47,7 @@ const CreateHoot = () => {
       beak: selectedBeak?.imageurl || null,
       eyes: selectedEyes?.imageurl || null,
       outfit: selectedOutfit?.imageurl || null,
-      submittedby: "user123", // Example, replace with actual user or form input
+      submittedby: "Anon", // Example, replace with actual user or form input
     };
 
     // Validate if required fields are selected
